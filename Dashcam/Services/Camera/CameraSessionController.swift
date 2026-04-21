@@ -139,6 +139,7 @@ final class CameraSessionController: NSObject, ObservableObject {
 
         let output = AVCaptureVideoDataOutput()
         output.alwaysDiscardsLateVideoFrames = true
+        output.videoSettings = Self.multiCamPixelSettings
         output.setSampleBufferDelegate(self, queue: videoQueue)
         guard session.canAddOutput(output) else {
             session.commitConfiguration()

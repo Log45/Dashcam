@@ -22,6 +22,11 @@
 		BF0C00000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F10C00000000000000000001 /* Assets.xcassets */; };
 		BF0D00000000000000000001 /* PictureInPictureBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10D00000000000000000001 /* PictureInPictureBridge.swift */; };
 		BF0E00000000000000000001 /* PiPInlineContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10E00000000000000000001 /* PiPInlineContainer.swift */; };
+		BF1000000000000000000001 /* DashcamRecordingAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11100000000000000000001 /* DashcamRecordingAttributes.swift */; };
+		BF1000000000000000000002 /* RecordingLiveActivityBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11100000000000000000002 /* RecordingLiveActivityBootstrap.swift */; };
+		BF1000000000000000000101 /* DashcamRecordingAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11100000000000000000001 /* DashcamRecordingAttributes.swift */; };
+		BF1000000000000000000102 /* RecordingLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11100000000000000000003 /* RecordingLiveActivityWidget.swift */; };
+		BF1000000000000000000103 /* DashcamRecordingLiveActivity.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F10000000000000000000002 /* DashcamRecordingLiveActivity.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,10 +47,22 @@
 		F10D00000000000000000001 /* PictureInPictureBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureInPictureBridge.swift; sourceTree = "<group>"; };
 		F10E00000000000000000001 /* PiPInlineContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiPInlineContainer.swift; sourceTree = "<group>"; };
 		F10F00000000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F10000000000000000000002 /* DashcamRecordingLiveActivity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DashcamRecordingLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F11100000000000000000001 /* DashcamRecordingAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashcamRecordingAttributes.swift; sourceTree = "<group>"; };
+		F11100000000000000000002 /* RecordingLiveActivityBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingLiveActivityBootstrap.swift; sourceTree = "<group>"; };
+		F11100000000000000000003 /* RecordingLiveActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingLiveActivityWidget.swift; sourceTree = "<group>"; };
+		F11100000000000000000004 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		F20000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F80200000000000000000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -59,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				F30100000000000000000001 /* Dashcam */,
+				F31700000000000000000001 /* DashcamRecordingLiveActivity */,
 				F30200000000000000000001 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,6 +89,7 @@
 				F31100000000000000000001 /* Features */,
 				F31200000000000000000001 /* Models */,
 				F31300000000000000000001 /* Services */,
+				F31600000000000000000001 /* LiveActivity */,
 				F31400000000000000000001 /* Resources */,
 			);
 			path = Dashcam;
@@ -80,6 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				F10000000000000000000001 /* Dashcam.app */,
+				F10000000000000000000002 /* DashcamRecordingLiveActivity.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -174,7 +194,39 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		F31600000000000000000001 /* LiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				F11100000000000000000001 /* DashcamRecordingAttributes.swift */,
+				F11100000000000000000002 /* RecordingLiveActivityBootstrap.swift */,
+			);
+			path = LiveActivity;
+			sourceTree = "<group>";
+		};
+		F31700000000000000000001 /* DashcamRecordingLiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				F11100000000000000000004 /* Info.plist */,
+				F11100000000000000000003 /* RecordingLiveActivityWidget.swift */,
+			);
+			path = DashcamRecordingLiveActivity;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F80300000000000000000001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BF1000000000000000000103 /* DashcamRecordingLiveActivity.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		F40000000000000000000001 /* Dashcam */ = {
@@ -184,17 +236,53 @@
 				F40100000000000000000001 /* Sources */,
 				F20000000000000000000001 /* Frameworks */,
 				F40200000000000000000001 /* Resources */,
+				F80300000000000000000001 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F80500000000000000000001 /* PBXTargetDependency */,
 			);
 			name = Dashcam;
 			productName = Dashcam;
 			productReference = F10000000000000000000001 /* Dashcam.app */;
 			productType = "com.apple.product-type.application";
 		};
+		F80000000000000000000001 /* DashcamRecordingLiveActivity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F80600000000000000000001 /* Build configuration list for PBXNativeTarget "DashcamRecordingLiveActivity" */;
+			buildPhases = (
+				F80100000000000000000001 /* Sources */,
+				F80200000000000000000001 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DashcamRecordingLiveActivity;
+			productName = DashcamRecordingLiveActivity;
+			productReference = F10000000000000000000002 /* DashcamRecordingLiveActivity.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
+
+/* Begin PBXContainerItemProxy section */
+		F80400000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F50000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F80000000000000000000001;
+			remoteInfo = DashcamRecordingLiveActivity;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		F80500000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F80000000000000000000001 /* DashcamRecordingLiveActivity */;
+			targetProxy = F80400000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXProject section */
 		F50000000000000000000001 /* Project object */ = {
@@ -205,6 +293,9 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					F40000000000000000000001 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					F80000000000000000000001 = {
 						CreatedOnToolsVersion = 16.0;
 					};
 				};
@@ -223,6 +314,7 @@
 			projectRoot = "";
 			targets = (
 				F40000000000000000000001 /* Dashcam */,
+				F80000000000000000000001 /* DashcamRecordingLiveActivity */,
 			);
 		};
 /* End PBXProject section */
@@ -257,6 +349,17 @@
 				BF0B00000000000000000001 /* DashcamViewModel.swift in Sources */,
 				BF0D00000000000000000001 /* PictureInPictureBridge.swift in Sources */,
 				BF0E00000000000000000001 /* PiPInlineContainer.swift in Sources */,
+				BF1000000000000000000001 /* DashcamRecordingAttributes.swift in Sources */,
+				BF1000000000000000000002 /* RecordingLiveActivityBootstrap.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F80100000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF1000000000000000000101 /* DashcamRecordingAttributes.swift in Sources */,
+				BF1000000000000000000102 /* RecordingLiveActivityWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -442,6 +545,57 @@
 			};
 			name = Release;
 		};
+		F80700000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NWKN8958ST;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DashcamRecordingLiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.AutoDashcam.RecordingLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F80800000000000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NWKN8958ST;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DashcamRecordingLiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.AutoDashcam.RecordingLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -459,6 +613,15 @@
 			buildConfigurations = (
 				F60000000000000000000011 /* Debug */,
 				F60000000000000000000012 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F80600000000000000000001 /* Build configuration list for PBXNativeTarget "DashcamRecordingLiveActivity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F80700000000000000000001 /* Debug */,
+				F80800000000000000000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

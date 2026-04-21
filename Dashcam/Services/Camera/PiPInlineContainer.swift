@@ -13,14 +13,22 @@ struct PiPInlineContainer: UIViewRepresentable {
 
     func updateUIView(_ uiView: PiPHostUIView, context: Context) {
         uiView.attach(bridge: bridge)
-        bridge.sampleBufferDisplayLayer.frame = uiView.bounds
-        bridge.preparePictureInPictureControllerIfNeeded()
-        bridge.refreshPiPState()
+        uiView.notifyInlineHostChanged()
     }
 }
 
 final class PiPHostUIView: UIView {
     private weak var boundBridge: PictureInPictureBridge?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isUserInteractionEnabled = true
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        isUserInteractionEnabled = true
+    }
 
     func attach(bridge: PictureInPictureBridge) {
         if boundBridge !== bridge {
@@ -28,11 +36,21 @@ final class PiPHostUIView: UIView {
             boundBridge = bridge
             layer.addSublayer(bridge.sampleBufferDisplayLayer)
         }
-        bridge.sampleBufferDisplayLayer.frame = bounds
+        notifyInlineHostChanged()
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        boundBridge?.sampleBufferDisplayLayer.frame = bounds
+        notifyInlineHostChanged()
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        notifyInlineHostChanged()
+    }
+
+    /// Main-thread layout / window hooks so PiP prepares only when the display layer is actually on-screen.
+    func notifyInlineHostChanged() {
+        boundBridge?.inlineHostUpdated(bounds: bounds, isInWindow: window != nil)
     }
 }

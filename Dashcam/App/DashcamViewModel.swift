@@ -25,6 +25,7 @@ final class DashcamViewModel: ObservableObject {
     private let collision = CollisionMonitor()
     private let accelerationLogger = AccelerationDebugLogger()
     private var cancellables = Set<AnyCancellable>()
+    private var didAttemptAutoPiPThisRecordingSession = false
 
     init() {
         settings.objectWillChange
@@ -46,6 +47,14 @@ final class DashcamViewModel: ObservableObject {
 
         settings.$debugAccelerationLogging
             .sink { [weak self] _ in self?.syncAccelerationDebugLogging() }
+            .store(in: &cancellables)
+
+        pipBridge.$isPictureInPicturePossible
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] possible in
+                guard possible else { return }
+                self?.tryAutoStartPiPWhenPossible()
+            }
             .store(in: &cancellables)
     }
 
@@ -72,8 +81,55 @@ final class DashcamViewModel: ObservableObject {
 
     func onAppear() {
         pipBridge.cameraModeProvider = { [weak self] in self?.effectiveCameraMode ?? .back }
+        pipBridge.onPiPFailureMessage = { [weak self] message in
+            Task { @MainActor [weak self] in
+                self?.showBanner(message, error: true)
+            }
+        }
         camera.sampleBufferTee = pipBridge
         applyCameraConfiguration(startSession: true)
+    }
+
+    /// Starts PiP when the system says it is possible; otherwise explains why the button had no effect.
+    func floatOverMapsTapped() {
+        guard pipBridge.isPictureInPictureSupported else {
+            showBanner("Picture in Picture is not supported on this device.", error: true)
+            return
+        }
+        guard camera.captureSession != nil else {
+            showBanner("Camera is not ready yet.", error: true)
+            return
+        }
+        guard pipBridge.isPictureInPicturePossible else {
+            showBanner(
+                "Picture in Picture is not ready yet. Wait until the small preview shows live video, then try again.",
+                error: false
+            )
+            return
+        }
+        pipBridge.startPictureInPictureFromMain()
+    }
+
+    /// Call when returning to the foreground after the app was backgrounded while recording without PiP.
+    func userReturnedFromForegroundWhileRecordingWithoutPiP() {
+        guard isRecording else { return }
+        guard !pipBridge.isPictureInPictureActive else { return }
+        showBanner(
+            "Recording may pause in the background until you start Float over Maps (Picture in Picture). Open Float over Maps when the small preview is live.",
+            error: false
+        )
+    }
+
+    private func tryAutoStartPiPWhenPossible() {
+        guard isRecording, settings.autoStartPiPWhenRecording else { return }
+        attemptSingleAutoPiPStart()
+    }
+
+    private func attemptSingleAutoPiPStart() {
+        guard !didAttemptAutoPiPThisRecordingSession else { return }
+        guard pipBridge.isPictureInPictureSupported, pipBridge.isPictureInPicturePossible else { return }
+        didAttemptAutoPiPThisRecordingSession = true
+        pipBridge.startPictureInPictureFromMain()
     }
 
     func applyCameraConfiguration(startSession: Bool) {
@@ -118,9 +174,12 @@ final class DashcamViewModel: ObservableObject {
         collision.cooldownSeconds = settings.collisionCooldownClamped
         collision.start()
 
+        didAttemptAutoPiPThisRecordingSession = false
         isRecording = true
         syncAccelerationDebugLogging()
         showBanner("Recording with a \(Int(settings.bufferSecondsClamped))s rolling buffer.", error: false)
+        tryAutoStartPiPWhenPossible()
+        RecordingLiveActivityBootstrap.startIfAvailable()
     }
 
     func stopRecording() {
@@ -129,8 +188,10 @@ final class DashcamViewModel: ObservableObject {
         pipeline?.discard()
         pipeline = nil
         isRecording = false
+        didAttemptAutoPiPThisRecordingSession = false
         syncAccelerationDebugLogging()
         showBanner("Recording stopped.", error: false)
+        RecordingLiveActivityBootstrap.endIfAvailable()
     }
 
     func saveTapped() {

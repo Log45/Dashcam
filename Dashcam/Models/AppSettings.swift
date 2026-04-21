@@ -42,12 +42,18 @@ final class AppSettings: ObservableObject {
         didSet { defaults.set(debugAccelerationLogging, forKey: Keys.debugAccelerationLogging) }
     }
 
+    /// When enabled, starts Picture in Picture automatically once the system reports PiP is possible after you tap Record.
+    @Published var autoStartPiPWhenRecording: Bool {
+        didSet { defaults.set(autoStartPiPWhenRecording, forKey: Keys.autoStartPiPWhenRecording) }
+    }
+
     private enum Keys {
         static let cameraMode = "cameraMode"
         static let bufferSeconds = "bufferSeconds"
         static let collisionThresholdG = "collisionThresholdG"
         static let collisionCooldown = "collisionCooldownSeconds"
         static let debugAccelerationLogging = "debugAccelerationLogging"
+        static let autoStartPiPWhenRecording = "autoStartPiPWhenRecording"
     }
 
     init() {
@@ -58,6 +64,11 @@ final class AppSettings: ObservableObject {
         collisionThresholdG = defaults.object(forKey: Keys.collisionThresholdG) as? Double ?? 2.5
         collisionCooldownSeconds = defaults.object(forKey: Keys.collisionCooldown) as? Double ?? 8
         debugAccelerationLogging = defaults.bool(forKey: Keys.debugAccelerationLogging)
+        if defaults.object(forKey: Keys.autoStartPiPWhenRecording) == nil {
+            autoStartPiPWhenRecording = true
+        } else {
+            autoStartPiPWhenRecording = defaults.bool(forKey: Keys.autoStartPiPWhenRecording)
+        }
     }
 
     var bufferSecondsClamped: Double {

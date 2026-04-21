@@ -2,7 +2,7 @@ import AVFoundation
 import AVKit
 import Combine
 import CoreMedia
-import UIKit
+import Foundation
 
 /// Feeds one camera stream into `AVSampleBufferDisplayLayer` and drives PiP so capture can continue over other apps (e.g. Maps).
 final class PictureInPictureBridge: NSObject, ObservableObject {
@@ -16,19 +16,45 @@ final class PictureInPictureBridge: NSObject, ObservableObject {
     /// Match `DashcamViewModel.effectiveCameraMode` for which stream to mirror into PiP.
     var cameraModeProvider: () -> CameraMode = { .back }
 
+    /// Called on the main queue when PiP fails to start (for banners / alerts).
+    var onPiPFailureMessage: ((String) -> Void)?
+
     private var pipController: AVPictureInPictureController?
-    private var playbackPaused = false
+    private var pipPossibleObservation: NSKeyValueObservation?
+    private var pipActiveObservation: NSKeyValueObservation?
     private var prepared = false
+
+    /// Coalesce camera frames onto one pending sample; unbounded `main.async` per frame starves the run loop and the inline layer never draws.
+    private let coalesceLock = NSLock()
+    private var coalescedLatestSampleBuffer: CMSampleBuffer?
+    private var coalescedDrainScheduled = false
 
     override init() {
         super.init()
         sampleBufferDisplayLayer.videoGravity = .resizeAspectFill
         isPictureInPictureSupported = AVPictureInPictureController.isPictureInPictureSupported()
+
+        // Live camera: nil timebase lets the layer follow buffer timestamps (avoids Swift/C API mismatch for CMTimebase).
+        sampleBufferDisplayLayer.controlTimebase = nil
     }
 
-    /// Call once the display layer is in a window hierarchy (e.g. from `UIViewRepresentable`).
-    func preparePictureInPictureControllerIfNeeded() {
-        guard isPictureInPictureSupported, !prepared else { return }
+    deinit {
+        removePipControllerObservations()
+    }
+
+    /// Call from the main thread when the inline host view lays out. PiP should be prepared only with non-zero bounds **and** when the layer is in a `window` (per AVKit).
+    func inlineHostUpdated(bounds: CGRect, isInWindow: Bool) {
+        assert(Thread.isMainThread)
+        sampleBufferDisplayLayer.frame = CGRect(origin: .zero, size: bounds.size)
+        let nonEmpty = bounds.width > 1 && bounds.height > 1
+        preparePictureInPictureControllerIfNeeded(inlineBoundsNonEmpty: nonEmpty, inlineHostInWindow: isInWindow)
+        refreshPiPState()
+    }
+
+    /// Call when inline bounds are known and non-zero (e.g. from `UIViewRepresentable`).
+    func preparePictureInPictureControllerIfNeeded(inlineBoundsNonEmpty: Bool, inlineHostInWindow: Bool = true) {
+        guard isPictureInPictureSupported, inlineBoundsNonEmpty, inlineHostInWindow else { return }
+        guard !prepared else { return }
         prepared = true
 
         do {
@@ -48,7 +74,100 @@ final class PictureInPictureBridge: NSObject, ObservableObject {
         controller.canStartPictureInPictureAutomaticallyFromInline = true
         controller.delegate = self
         pipController = controller
+        installPipControllerObservations()
         refreshPiPState()
+    }
+
+    /// Tear down PiP when the capture session stops so the next session can prepare again with valid bounds.
+    func resetForCaptureSessionEnded() {
+        DispatchQueue.main.async { [weak self] in
+            self?.performResetForCaptureSessionEnded()
+        }
+    }
+
+    private func performResetForCaptureSessionEnded() {
+        pipController?.stopPictureInPicture()
+        removePipControllerObservations()
+        pipController = nil
+        prepared = false
+        flushDisplayLayerSync()
+        isPictureInPicturePossible = false
+        isPictureInPictureActive = false
+    }
+
+    /// `AVSampleBufferDisplayLayer` is hosted in UIKit; keep `enqueue` / `flush` on the main queue only.
+    private func flushDisplayLayerSync() {
+        let flush = { [weak self] in
+            guard let self else { return }
+            self.coalesceLock.lock()
+            self.coalescedLatestSampleBuffer = nil
+            self.coalescedDrainScheduled = false
+            self.coalesceLock.unlock()
+            self.sampleBufferDisplayLayer.flushAndRemoveImage()
+        }
+        if Thread.isMainThread {
+            flush()
+        } else {
+            DispatchQueue.main.sync(execute: flush)
+        }
+    }
+
+    private func drainCoalescedSampleBuffersOnMain() {
+        assert(Thread.isMainThread)
+        while true {
+            coalesceLock.lock()
+            let buffer = coalescedLatestSampleBuffer
+            coalescedLatestSampleBuffer = nil
+            coalesceLock.unlock()
+
+            guard let buffer else {
+                coalesceLock.lock()
+                coalescedDrainScheduled = false
+                let pending = coalescedLatestSampleBuffer != nil
+                coalesceLock.unlock()
+                if pending {
+                    continue
+                }
+                return
+            }
+
+            if sampleBufferDisplayLayer.status == .failed {
+                sampleBufferDisplayLayer.flushAndRemoveImage()
+            }
+            sampleBufferDisplayLayer.enqueue(buffer)
+        }
+    }
+
+    private func installPipControllerObservations() {
+        removePipControllerObservations()
+        guard let pipController else { return }
+
+        pipPossibleObservation = pipController.observe(
+            \.isPictureInPicturePossible,
+            options: [.initial, .new]
+        ) { [weak self] controller, change in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.isPictureInPicturePossible = change.newValue ?? controller.isPictureInPicturePossible
+            }
+        }
+
+        pipActiveObservation = pipController.observe(
+            \.isPictureInPictureActive,
+            options: [.initial, .new]
+        ) { [weak self] controller, change in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.isPictureInPictureActive = change.newValue ?? controller.isPictureInPictureActive
+            }
+        }
+    }
+
+    private func removePipControllerObservations() {
+        pipPossibleObservation?.invalidate()
+        pipActiveObservation?.invalidate()
+        pipPossibleObservation = nil
+        pipActiveObservation = nil
     }
 
     func refreshPiPState() {
@@ -71,10 +190,11 @@ final class PictureInPictureBridge: NSObject, ObservableObject {
 
 extension PictureInPictureBridge: CameraSampleBufferTee {
     func sessionDidStop() {
-        sampleBufferDisplayLayer.flushAndRemoveImage()
+        flushDisplayLayerSync()
         DispatchQueue.main.async { [weak self] in
             self?.pipController?.stopPictureInPicture()
         }
+        resetForCaptureSessionEnded()
     }
 
     func tee(sampleBuffer: CMSampleBuffer, source: CameraVideoSource) {
@@ -90,19 +210,26 @@ extension PictureInPictureBridge: CameraSampleBufferTee {
         }
         guard include else { return }
 
-        if sampleBufferDisplayLayer.status == .failed {
-            sampleBufferDisplayLayer.flushAndRemoveImage()
+        coalesceLock.lock()
+        coalescedLatestSampleBuffer = sampleBuffer
+        let kick = !coalescedDrainScheduled
+        if kick {
+            coalescedDrainScheduled = true
         }
-        sampleBufferDisplayLayer.enqueue(sampleBuffer)
+        coalesceLock.unlock()
+        guard kick else { return }
+        DispatchQueue.main.async { [weak self] in
+            self?.drainCoalescedSampleBuffersOnMain()
+        }
     }
 }
 
 extension PictureInPictureBridge: AVPictureInPictureSampleBufferPlaybackDelegate {
     func pictureInPictureController(
         _ pictureInPictureController: AVPictureInPictureController,
-        setPlaying playing: Bool
+        setPlaying _: Bool
     ) {
-        playbackPaused = !playing
+        // Live camera: do not honor PiP “pause” for the sample-buffer path or the inline layer stops updating.
         pictureInPictureController.invalidatePlaybackState()
     }
 
@@ -115,7 +242,7 @@ extension PictureInPictureBridge: AVPictureInPictureSampleBufferPlaybackDelegate
     func pictureInPictureControllerIsPlaybackPaused(
         _ pictureInPictureController: AVPictureInPictureController
     ) -> Bool {
-        playbackPaused
+        false
     }
 
     func pictureInPictureController(
@@ -150,6 +277,17 @@ extension PictureInPictureBridge: AVPictureInPictureControllerDelegate {
     func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         DispatchQueue.main.async { [weak self] in
             self?.isPictureInPictureActive = false
+            self?.refreshPiPState()
+        }
+    }
+
+    func pictureInPictureController(
+        _ pictureInPictureController: AVPictureInPictureController,
+        failedToStartPictureInPictureWithError error: Error
+    ) {
+        let text = error.localizedDescription
+        DispatchQueue.main.async { [weak self] in
+            self?.onPiPFailureMessage?(text.isEmpty ? "Picture in Picture could not start." : text)
             self?.refreshPiPState()
         }
     }

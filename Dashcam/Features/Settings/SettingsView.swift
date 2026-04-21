@@ -6,6 +6,17 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section("Picture in Picture") {
+                Toggle("Auto-start PiP when recording", isOn: $viewModel.settings.autoStartPiPWhenRecording)
+                    .disabled(viewModel.isRecording)
+
+                Text(
+                    "When on, Dashcam starts Float over Maps as soon as iOS says PiP is ready after you tap Record—needed for continuous capture while you use other apps."
+                )
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
+
             Section("Camera") {
                 Picker("Camera", selection: $viewModel.settings.cameraMode) {
                     ForEach(CameraMode.allCases) { mode in
