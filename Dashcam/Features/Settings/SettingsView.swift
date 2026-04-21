@@ -57,6 +57,16 @@ struct SettingsView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
+
+            Section("Debug") {
+                Toggle("Log acceleration to file", isOn: $viewModel.settings.debugAccelerationLogging)
+
+                Text(
+                    "While recording, appends about 50 samples per second with ISO timestamps under On My iPhone → Dashcam → Documents → DebugLogs (tab-separated: time, ax, ay, az, magnitude_g, threshold_g). A new file starts each time logging begins."
+                )
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)

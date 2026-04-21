@@ -3,7 +3,7 @@ import Combine
 import Foundation
 import SwiftUI
 
-enum ExportTrigger: String {
+enum ExportTrigger: String, Sendable {
     case manualSave
     case collision
 }
@@ -23,6 +23,7 @@ final class DashcamViewModel: ObservableObject {
 
     private var pipeline: CapturePipeline?
     private let collision = CollisionMonitor()
+    private let accelerationLogger = AccelerationDebugLogger()
     private var cancellables = Set<AnyCancellable>()
 
     init() {
@@ -41,6 +42,31 @@ final class DashcamViewModel: ObservableObject {
         collision.onSpike = { [weak self] in
             guard let self else { return }
             Task { await self.exportRollingWindow(trigger: .collision) }
+        }
+
+        settings.$debugAccelerationLogging
+            .sink { [weak self] _ in self?.syncAccelerationDebugLogging() }
+            .store(in: &cancellables)
+    }
+
+    private func syncAccelerationDebugLogging() {
+        let logging = settings.debugAccelerationLogging && isRecording
+        collision.onRawAccelerationSample = nil
+        accelerationLogger.updateSession(
+            isRecording: isRecording,
+            debugEnabled: settings.debugAccelerationLogging
+        )
+        guard logging else { return }
+        let logger = accelerationLogger
+        collision.onRawAccelerationSample = { ax, ay, az, magnitude, thresholdG, date in
+            logger.appendSample(
+                ax: ax,
+                ay: ay,
+                az: az,
+                magnitude: magnitude,
+                thresholdG: thresholdG,
+                timestamp: date
+            )
         }
     }
 
@@ -93,6 +119,7 @@ final class DashcamViewModel: ObservableObject {
         collision.start()
 
         isRecording = true
+        syncAccelerationDebugLogging()
         showBanner("Recording with a \(Int(settings.bufferSecondsClamped))s rolling buffer.", error: false)
     }
 
@@ -102,6 +129,7 @@ final class DashcamViewModel: ObservableObject {
         pipeline?.discard()
         pipeline = nil
         isRecording = false
+        syncAccelerationDebugLogging()
         showBanner("Recording stopped.", error: false)
     }
 
@@ -120,7 +148,7 @@ final class DashcamViewModel: ObservableObject {
             showBanner("Start recording before saving a clip.", error: true)
             return
         }
-        guard let pipeline else {
+        guard pipeline != nil else {
             showBanner("Recorder not active.", error: true)
             return
         }
@@ -132,63 +160,71 @@ final class DashcamViewModel: ObservableObject {
         isExporting = true
         exportProgress = 0
 
+        if trigger == .collision {
+            try? await Task.sleep(for: .seconds(3))
+            guard isRecording, pipeline != nil else {
+                isExporting = false
+                showBanner("Recording stopped before the collision clip could be finalized.", error: true)
+                return
+            }
+        }
+
+        guard let pipeline else {
+            isExporting = false
+            return
+        }
+
         let seconds = settings.bufferSecondsClamped
 
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             pipeline.flushAll {
                 pipeline.collectSegmentURLs(seconds: seconds) { map in
-                    Task { @MainActor in
-                        await self.performExport(map: map, trigger: trigger, seconds: seconds)
-                        continuation.resume()
+                    let box = ExportMapBox(map: map)
+                    let progressSink = ExportProgressSink(owner: self)
+                    Task.detached(priority: .userInitiated) {
+                        do {
+                            let outcome = try await runRollingClipExportOffMainActor(
+                                map: box.map,
+                                trigger: trigger,
+                                seconds: seconds,
+                                progress: { progressSink.push($0) }
+                            )
+                            await MainActor.run { [weak self] in
+                                guard let self else {
+                                    continuation.resume()
+                                    return
+                                }
+                                self.isExporting = false
+                                self.exportProgress = outcome.bannerIsError ? 0 : 1
+                                self.showBanner(outcome.bannerText, error: outcome.bannerIsError)
+                                if outcome.restartCollisionMonitoring {
+                                    self.collision.stop()
+                                    self.collision.thresholdG = self.settings.collisionThresholdClamped
+                                    self.collision.cooldownSeconds = self.settings.collisionCooldownClamped
+                                    self.collision.start()
+                                }
+                                continuation.resume()
+                            }
+                        } catch {
+                            await MainActor.run { [weak self] in
+                                self?.isExporting = false
+                                self?.showBanner(error.localizedDescription, error: true)
+                                continuation.resume()
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    private func performExport(
-        map: [CameraVideoSource: [URL]],
-        trigger: ExportTrigger,
-        seconds: Double
-    ) async {
-        defer { isExporting = false }
-
-        guard !map.isEmpty else {
-            showBanner("Not enough buffered video yet—record a little longer.", error: true)
-            return
-        }
-
-        let eventsRoot = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            .appendingPathComponent("Events", isDirectory: true)
-        try? FileManager.default.createDirectory(at: eventsRoot, withIntermediateDirectories: true)
-
-        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
-        let prefix = "\(trigger.rawValue)_\(stamp)"
-
-        do {
-            var outputs: [String] = []
-            for (source, urls) in map.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
-                let destination = eventsRoot.appendingPathComponent("\(prefix)_\(source.rawValue).mp4")
-                try await ClipExporter.export(videoSegmentURLs: urls, to: destination) { [weak self] p in
-                    Task { @MainActor in
-                        self?.exportProgress = p
-                    }
-                }
-                outputs.append(destination.lastPathComponent)
+    private final class ExportProgressSink: @unchecked Sendable {
+        weak var owner: DashcamViewModel?
+        init(owner: DashcamViewModel) { self.owner = owner }
+        func push(_ p: Float) {
+            Task { @MainActor [weak owner] in
+                owner?.exportProgress = p
             }
-
-            exportProgress = 1
-            let label = trigger == .collision ? "Collision clip saved" : "Clip saved"
-            showBanner("\(label) (~\(Int(seconds))s): \(outputs.joined(separator: ", "))", error: false)
-
-            if trigger == .collision {
-                collision.stop()
-                collision.thresholdG = settings.collisionThresholdClamped
-                collision.cooldownSeconds = settings.collisionCooldownClamped
-                collision.start()
-            }
-        } catch {
-            showBanner(error.localizedDescription, error: true)
         }
     }
 
@@ -200,4 +236,56 @@ final class DashcamViewModel: ObservableObject {
     func dismissBanner() {
         bannerMessage = nil
     }
+}
+
+// MARK: - Rolling export (off MainActor; avoids starving Fig / gesture during Save)
+
+private struct ExportMapBox: @unchecked Sendable {
+    let map: [CameraVideoSource: [URL]]
+}
+
+private struct RollingClipExportOutcome: Sendable {
+    let outputFilenames: [String]
+    let bannerText: String
+    let bannerIsError: Bool
+    let restartCollisionMonitoring: Bool
+}
+
+private func runRollingClipExportOffMainActor(
+    map: [CameraVideoSource: [URL]],
+    trigger: ExportTrigger,
+    seconds: Double,
+    progress: @escaping (Float) -> Void
+) async throws -> RollingClipExportOutcome {
+    guard !map.isEmpty else {
+        return RollingClipExportOutcome(
+            outputFilenames: [],
+            bannerText: "Not enough buffered video yet—record a little longer.",
+            bannerIsError: true,
+            restartCollisionMonitoring: false
+        )
+    }
+
+    let eventsRoot = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        .appendingPathComponent("Events", isDirectory: true)
+    try? FileManager.default.createDirectory(at: eventsRoot, withIntermediateDirectories: true)
+
+    let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+    let prefix = "\(trigger.rawValue)_\(stamp)"
+
+    var outputs: [String] = []
+    for (source, urls) in map.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
+        let destination = eventsRoot.appendingPathComponent("\(prefix)_\(source.rawValue).mp4")
+        try await ClipExporter.export(videoSegmentURLs: urls, to: destination, progress: progress)
+        outputs.append(destination.lastPathComponent)
+    }
+
+    let label = trigger == .collision ? "Collision clip saved" : "Clip saved"
+    let bannerText = "\(label) (~\(Int(seconds))s): \(outputs.joined(separator: ", "))"
+    return RollingClipExportOutcome(
+        outputFilenames: outputs,
+        bannerText: bannerText,
+        bannerIsError: false,
+        restartCollisionMonitoring: trigger == .collision
+    )
 }

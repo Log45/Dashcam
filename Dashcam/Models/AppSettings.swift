@@ -38,11 +38,16 @@ final class AppSettings: ObservableObject {
         didSet { defaults.set(collisionCooldownSeconds, forKey: Keys.collisionCooldown) }
     }
 
+    @Published var debugAccelerationLogging: Bool {
+        didSet { defaults.set(debugAccelerationLogging, forKey: Keys.debugAccelerationLogging) }
+    }
+
     private enum Keys {
         static let cameraMode = "cameraMode"
         static let bufferSeconds = "bufferSeconds"
         static let collisionThresholdG = "collisionThresholdG"
         static let collisionCooldown = "collisionCooldownSeconds"
+        static let debugAccelerationLogging = "debugAccelerationLogging"
     }
 
     init() {
@@ -52,6 +57,7 @@ final class AppSettings: ObservableObject {
         bufferSeconds = buf
         collisionThresholdG = defaults.object(forKey: Keys.collisionThresholdG) as? Double ?? 2.5
         collisionCooldownSeconds = defaults.object(forKey: Keys.collisionCooldown) as? Double ?? 8
+        debugAccelerationLogging = defaults.bool(forKey: Keys.debugAccelerationLogging)
     }
 
     var bufferSecondsClamped: Double {

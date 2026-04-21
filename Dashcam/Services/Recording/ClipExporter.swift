@@ -62,16 +62,15 @@ enum ClipExporter {
         let box = ExportSessionBox(exporter)
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            let progressTask = Task { @MainActor in
+            // Poll off the main actor so capture / Fig are not starved during long exports.
+            let progressTask = Task(priority: .utility) {
                 while !Task.isCancelled {
                     try? await Task.sleep(nanoseconds: 150_000_000)
                     let session = box.session
+                    let status = session.status
                     progress(session.progress)
-                    switch session.status {
-                    case .completed, .failed, .cancelled:
+                    if status == .completed || status == .failed || status == .cancelled {
                         return
-                    default:
-                        break
                     }
                 }
             }
@@ -81,16 +80,14 @@ enum ClipExporter {
                 let session = box.session
                 let status = session.status
                 let errorText = session.error?.localizedDescription
-                Task { @MainActor in
-                    progress(1.0)
-                    switch status {
-                    case .completed:
-                        continuation.resume()
-                    case .failed, .cancelled:
-                        continuation.resume(throwing: ClipExporterError.exportFailed(errorText))
-                    default:
-                        continuation.resume(throwing: ClipExporterError.exportFailed("Unexpected export status"))
-                    }
+                progress(1.0)
+                switch status {
+                case .completed:
+                    continuation.resume()
+                case .failed, .cancelled:
+                    continuation.resume(throwing: ClipExporterError.exportFailed(errorText))
+                default:
+                    continuation.resume(throwing: ClipExporterError.exportFailed("Unexpected export status"))
                 }
             }
         }

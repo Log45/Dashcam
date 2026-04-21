@@ -2,6 +2,7 @@ import AVFoundation
 import Combine
 import CoreMedia
 import Foundation
+import UIKit
 
 protocol CameraSampleBufferConsumer: AnyObject {
     func ingest(sampleBuffer: CMSampleBuffer, source: CameraVideoSource)
@@ -12,7 +13,7 @@ protocol CameraSampleBufferTee: AnyObject {
     func sessionDidStop()
 }
 
-enum CameraVideoSource: String {
+enum CameraVideoSource: String, Sendable {
     case back
     case front
 }
@@ -45,7 +46,13 @@ final class CameraSessionController: NSObject, ObservableObject {
     weak var sampleBufferConsumer: CameraSampleBufferConsumer?
     weak var sampleBufferTee: CameraSampleBufferTee?
 
+    /// Set from `PreviewView` so `AVCaptureDevice.RotationCoordinator` can align capture + preview with gravity.
+    weak var previewVideoLayer: AVCaptureVideoPreviewLayer?
+
     var previewMirrored: Bool = false
+
+    private var rotationCoordinators: [AVCaptureDevice.RotationCoordinator] = []
+    private var rotationObservations: [NSKeyValueObservation] = []
 
     /// Bumped on each `reconfigure` so a slow multi-cam build cannot apply after a newer configuration.
     private var configurationGeneration = 0
@@ -140,9 +147,6 @@ final class CameraSessionController: NSObject, ObservableObject {
             return
         }
         session.addOutput(output)
-        if let connection = output.connection(with: .video), connection.isVideoRotationAngleSupported(0) {
-            connection.videoRotationAngle = 0
-        }
 
         session.commitConfiguration()
 
@@ -367,6 +371,94 @@ final class CameraSessionController: NSObject, ObservableObject {
         return .success(MultiCamBuiltSession(session: session, backOutput: backOutput, frontOutput: frontOutput))
     }
 
+    /// Call from the main thread when the SwiftUI preview layer is ready (same session as `captureSession`).
+    func updatePreviewVideoLayer(_ layer: AVCaptureVideoPreviewLayer) {
+        previewVideoLayer = layer
+        reinstallRotationCoordinatorsIfPossible()
+    }
+
+    private func removeRotationCoordinators() {
+        rotationObservations.forEach { $0.invalidate() }
+        rotationObservations.removeAll()
+        rotationCoordinators.removeAll()
+    }
+
+    private func reinstallRotationCoordinatorsIfPossible() {
+        removeRotationCoordinators()
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in self?.reinstallRotationCoordinatorsIfPossible() }
+            return
+        }
+        guard let session = captureSession, let previewLayer = previewVideoLayer else { return }
+        guard previewLayer.session === session else { return }
+
+        var coordinators: [AVCaptureDevice.RotationCoordinator] = []
+
+        let kvoOptions: NSKeyValueObservingOptions = [.initial, .new]
+
+        for case let input as AVCaptureDeviceInput in session.inputs where input.device.hasMediaType(.video) {
+            let coordinator = AVCaptureDevice.RotationCoordinator(device: input.device, previewLayer: previewLayer)
+            coordinators.append(coordinator)
+
+            let position = input.device.position
+            let captureObs = coordinator.observe(
+                \AVCaptureDevice.RotationCoordinator.videoRotationAngleForHorizonLevelCapture,
+                options: kvoOptions
+            ) { [weak self] (coord: AVCaptureDevice.RotationCoordinator, change: NSKeyValueObservedChange<CGFloat>) in
+                _ = change
+                let angle = coord.videoRotationAngleForHorizonLevelCapture
+                DispatchQueue.main.async {
+                    self?.applyCaptureRotationAngle(angle, devicePosition: position)
+                }
+            }
+            rotationObservations.append(captureObs)
+        }
+
+        rotationCoordinators = coordinators
+
+        let coordinatorForBackPreview: AVCaptureDevice.RotationCoordinator? = coordinators
+            .filter { rotationCoordinator in
+                guard let captureDevice = rotationCoordinator.device else { return false }
+                return captureDevice.position == AVCaptureDevice.Position.back
+            }
+            .first
+        let coordinatorForPreviewAngle = coordinatorForBackPreview ?? coordinators.first
+        guard let previewCoord = coordinatorForPreviewAngle else { return }
+
+        let previewObs = previewCoord.observe(
+            \AVCaptureDevice.RotationCoordinator.videoRotationAngleForHorizonLevelPreview,
+            options: kvoOptions
+        ) { [weak self] (coord: AVCaptureDevice.RotationCoordinator, change: NSKeyValueObservedChange<CGFloat>) in
+            _ = change
+            let angle = coord.videoRotationAngleForHorizonLevelPreview
+            DispatchQueue.main.async {
+                self?.applyPreviewRotationAngle(angle)
+            }
+        }
+        rotationObservations.append(previewObs)
+    }
+
+    private func applyCaptureRotationAngle(_ angle: CGFloat, devicePosition: AVCaptureDevice.Position) {
+        let output: AVCaptureVideoDataOutput?
+        switch devicePosition {
+        case .back:
+            output = backVideoOutput
+        case .front:
+            output = frontVideoOutput
+        default:
+            output = nil
+        }
+        guard let output, let connection = output.connection(with: .video) else { return }
+        guard connection.isVideoRotationAngleSupported(angle) else { return }
+        connection.videoRotationAngle = angle
+    }
+
+    private func applyPreviewRotationAngle(_ angle: CGFloat) {
+        guard let previewLayer = previewVideoLayer, let connection = previewLayer.connection else { return }
+        guard connection.isVideoRotationAngleSupported(angle) else { return }
+        connection.videoRotationAngle = angle
+    }
+
     func start() {
         guard let session = captureSession else { return }
         // `startRunning` must run on the main thread when using `AVCaptureVideoPreviewLayer`, or Fig can
@@ -374,15 +466,18 @@ final class CameraSessionController: NSObject, ObservableObject {
         DispatchQueue.main.async { [weak self] in
             guard !session.isRunning else {
                 self?.isRunning = true
+                self?.reinstallRotationCoordinatorsIfPossible()
                 return
             }
             session.startRunning()
             self?.installRuntimeErrorObserver(session: session)
             self?.isRunning = session.isRunning
+            self?.reinstallRotationCoordinatorsIfPossible()
         }
     }
 
     func stop() {
+        removeRotationCoordinators()
         removeRuntimeErrorObserver()
         backVideoOutput?.setSampleBufferDelegate(nil, queue: nil)
         frontVideoOutput?.setSampleBufferDelegate(nil, queue: nil)

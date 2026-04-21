@@ -22,6 +22,8 @@ final class PreviewHostView: UIView {
 struct PreviewView: UIViewRepresentable {
     let session: AVCaptureSession
     var mirrored: Bool = false
+    /// Invoked on the main thread when the preview layer is created or its session is updated (for rotation coordination).
+    var onPreviewLayerBound: ((AVCaptureVideoPreviewLayer) -> Void)?
 
     final class Coordinator {
         /// Session we last attached; used to avoid redundant nil swaps on SwiftUI relayout / rotation.
@@ -41,6 +43,7 @@ struct PreviewView: UIViewRepresentable {
         context.coordinator.boundSession = session
         context.coordinator.lastMirrored = nil
         applyMirroringIfNeeded(to: layer, mirrored: mirrored, coordinator: context.coordinator)
+        onPreviewLayerBound?(layer)
         return view
     }
 
@@ -56,6 +59,7 @@ struct PreviewView: UIViewRepresentable {
         }
 
         applyMirroringIfNeeded(to: layer, mirrored: mirrored, coordinator: coordinator)
+        onPreviewLayerBound?(layer)
     }
 
     private func applyMirroringIfNeeded(

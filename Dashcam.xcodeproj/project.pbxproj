@@ -17,6 +17,7 @@
 		BF0800000000000000000001 /* ClipExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10800000000000000000001 /* ClipExporter.swift */; };
 		BF0900000000000000000001 /* CapturePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10900000000000000000001 /* CapturePipeline.swift */; };
 		BF0A00000000000000000001 /* CollisionMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10A00000000000000000001 /* CollisionMonitor.swift */; };
+		BF0F00000000000000000001 /* AccelerationDebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11000000000000000000001 /* AccelerationDebugLogger.swift */; };
 		BF0B00000000000000000001 /* DashcamViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B00000000000000000001 /* DashcamViewModel.swift */; };
 		BF0C00000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F10C00000000000000000001 /* Assets.xcassets */; };
 		BF0D00000000000000000001 /* PictureInPictureBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10D00000000000000000001 /* PictureInPictureBridge.swift */; };
@@ -35,6 +36,7 @@
 		F10800000000000000000001 /* ClipExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipExporter.swift; sourceTree = "<group>"; };
 		F10900000000000000000001 /* CapturePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePipeline.swift; sourceTree = "<group>"; };
 		F10A00000000000000000001 /* CollisionMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollisionMonitor.swift; sourceTree = "<group>"; };
+		F11000000000000000000001 /* AccelerationDebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccelerationDebugLogger.swift; sourceTree = "<group>"; };
 		F10B00000000000000000001 /* DashcamViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashcamViewModel.swift; sourceTree = "<group>"; };
 		F10C00000000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F10D00000000000000000001 /* PictureInPictureBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureInPictureBridge.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				F10A00000000000000000001 /* CollisionMonitor.swift */,
+				F11000000000000000000001 /* AccelerationDebugLogger.swift */,
 			);
 			path = Motion;
 			sourceTree = "<group>";
@@ -250,6 +253,7 @@
 				BF0800000000000000000001 /* ClipExporter.swift in Sources */,
 				BF0900000000000000000001 /* CapturePipeline.swift in Sources */,
 				BF0A00000000000000000001 /* CollisionMonitor.swift in Sources */,
+				BF0F00000000000000000001 /* AccelerationDebugLogger.swift in Sources */,
 				BF0B00000000000000000001 /* DashcamViewModel.swift in Sources */,
 				BF0D00000000000000000001 /* PictureInPictureBridge.swift in Sources */,
 				BF0E00000000000000000001 /* PiPInlineContainer.swift in Sources */,

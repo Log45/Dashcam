@@ -11,7 +11,8 @@ struct ContentView: View {
                     if let session = viewModel.camera.captureSession {
                         PreviewView(
                             session: session,
-                            mirrored: viewModel.camera.previewMirrored
+                            mirrored: viewModel.camera.previewMirrored,
+                            onPreviewLayerBound: { viewModel.camera.updatePreviewVideoLayer($0) }
                         )
                         .id(ObjectIdentifier(session))
                         .ignoresSafeArea()
