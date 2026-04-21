@@ -1,0 +1,465 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BF0100000000000000000001 /* DashcamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10100000000000000000001 /* DashcamApp.swift */; };
+		BF0200000000000000000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10200000000000000000001 /* ContentView.swift */; };
+		BF0300000000000000000001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10300000000000000000001 /* SettingsView.swift */; };
+		BF0400000000000000000001 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10400000000000000000001 /* AppSettings.swift */; };
+		BF0500000000000000000001 /* CameraSessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10500000000000000000001 /* CameraSessionController.swift */; };
+		BF0600000000000000000001 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10600000000000000000001 /* PreviewView.swift */; };
+		BF0700000000000000000001 /* RollingSegmentRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10700000000000000000001 /* RollingSegmentRecorder.swift */; };
+		BF0800000000000000000001 /* ClipExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10800000000000000000001 /* ClipExporter.swift */; };
+		BF0900000000000000000001 /* CapturePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10900000000000000000001 /* CapturePipeline.swift */; };
+		BF0A00000000000000000001 /* CollisionMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10A00000000000000000001 /* CollisionMonitor.swift */; };
+		BF0B00000000000000000001 /* DashcamViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10B00000000000000000001 /* DashcamViewModel.swift */; };
+		BF0C00000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F10C00000000000000000001 /* Assets.xcassets */; };
+		BF0D00000000000000000001 /* PictureInPictureBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10D00000000000000000001 /* PictureInPictureBridge.swift */; };
+		BF0E00000000000000000001 /* PiPInlineContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10E00000000000000000001 /* PiPInlineContainer.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F10000000000000000000001 /* Dashcam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dashcam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F10100000000000000000001 /* DashcamApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashcamApp.swift; sourceTree = "<group>"; };
+		F10200000000000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		F10300000000000000000001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F10400000000000000000001 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		F10500000000000000000001 /* CameraSessionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionController.swift; sourceTree = "<group>"; };
+		F10600000000000000000001 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
+		F10700000000000000000001 /* RollingSegmentRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingSegmentRecorder.swift; sourceTree = "<group>"; };
+		F10800000000000000000001 /* ClipExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipExporter.swift; sourceTree = "<group>"; };
+		F10900000000000000000001 /* CapturePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePipeline.swift; sourceTree = "<group>"; };
+		F10A00000000000000000001 /* CollisionMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollisionMonitor.swift; sourceTree = "<group>"; };
+		F10B00000000000000000001 /* DashcamViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashcamViewModel.swift; sourceTree = "<group>"; };
+		F10C00000000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F10D00000000000000000001 /* PictureInPictureBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureInPictureBridge.swift; sourceTree = "<group>"; };
+		F10E00000000000000000001 /* PiPInlineContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiPInlineContainer.swift; sourceTree = "<group>"; };
+		F10F00000000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F20000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F30000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				F30100000000000000000001 /* Dashcam */,
+				F30200000000000000000001 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F30100000000000000000001 /* Dashcam */ = {
+			isa = PBXGroup;
+			children = (
+				F10F00000000000000000001 /* Info.plist */,
+				F31000000000000000000001 /* App */,
+				F31100000000000000000001 /* Features */,
+				F31200000000000000000001 /* Models */,
+				F31300000000000000000001 /* Services */,
+				F31400000000000000000001 /* Resources */,
+			);
+			path = Dashcam;
+			sourceTree = "<group>";
+		};
+		F30200000000000000000001 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F10000000000000000000001 /* Dashcam.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F31000000000000000000001 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				F10100000000000000000001 /* DashcamApp.swift */,
+				F10B00000000000000000001 /* DashcamViewModel.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		F31100000000000000000001 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				F31110000000000000000001 /* Capture */,
+				F31120000000000000000001 /* Settings */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		F31110000000000000000001 /* Capture */ = {
+			isa = PBXGroup;
+			children = (
+				F10200000000000000000001 /* ContentView.swift */,
+			);
+			path = Capture;
+			sourceTree = "<group>";
+		};
+		F31120000000000000000001 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				F10300000000000000000001 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		F31200000000000000000001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F10400000000000000000001 /* AppSettings.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F31300000000000000000001 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F31310000000000000000001 /* Camera */,
+				F31320000000000000000001 /* Recording */,
+				F31330000000000000000001 /* Motion */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F31310000000000000000001 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				F10500000000000000000001 /* CameraSessionController.swift */,
+				F10600000000000000000001 /* PreviewView.swift */,
+				F10D00000000000000000001 /* PictureInPictureBridge.swift */,
+				F10E00000000000000000001 /* PiPInlineContainer.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		F31320000000000000000001 /* Recording */ = {
+			isa = PBXGroup;
+			children = (
+				F10700000000000000000001 /* RollingSegmentRecorder.swift */,
+				F10800000000000000000001 /* ClipExporter.swift */,
+				F10900000000000000000001 /* CapturePipeline.swift */,
+			);
+			path = Recording;
+			sourceTree = "<group>";
+		};
+		F31330000000000000000001 /* Motion */ = {
+			isa = PBXGroup;
+			children = (
+				F10A00000000000000000001 /* CollisionMonitor.swift */,
+			);
+			path = Motion;
+			sourceTree = "<group>";
+		};
+		F31400000000000000000001 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F10C00000000000000000001 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F40000000000000000000001 /* Dashcam */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F50000000000000000000003 /* Build configuration list for PBXNativeTarget "Dashcam" */;
+			buildPhases = (
+				F40100000000000000000001 /* Sources */,
+				F20000000000000000000001 /* Frameworks */,
+				F40200000000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Dashcam;
+			productName = Dashcam;
+			productReference = F10000000000000000000001 /* Dashcam.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F50000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					F40000000000000000000001 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = F50000000000000000000002 /* Build configuration list for PBXProject "Dashcam" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F30000000000000000000001;
+			productRefGroup = F30200000000000000000001 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F40000000000000000000001 /* Dashcam */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F40200000000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF0C00000000000000000001 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F40100000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF0100000000000000000001 /* DashcamApp.swift in Sources */,
+				BF0200000000000000000001 /* ContentView.swift in Sources */,
+				BF0300000000000000000001 /* SettingsView.swift in Sources */,
+				BF0400000000000000000001 /* AppSettings.swift in Sources */,
+				BF0500000000000000000001 /* CameraSessionController.swift in Sources */,
+				BF0600000000000000000001 /* PreviewView.swift in Sources */,
+				BF0700000000000000000001 /* RollingSegmentRecorder.swift in Sources */,
+				BF0800000000000000000001 /* ClipExporter.swift in Sources */,
+				BF0900000000000000000001 /* CapturePipeline.swift in Sources */,
+				BF0A00000000000000000001 /* CollisionMonitor.swift in Sources */,
+				BF0B00000000000000000001 /* DashcamViewModel.swift in Sources */,
+				BF0D00000000000000000001 /* PictureInPictureBridge.swift in Sources */,
+				BF0E00000000000000000001 /* PiPInlineContainer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F60000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F60000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F60000000000000000000011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NWKN8958ST;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Dashcam/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Dashcam needs camera access to record a rolling buffer while you drive.";
+				INFOPLIST_KEY_UIBackgroundModes = audio;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.AutoDashcam;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F60000000000000000000012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NWKN8958ST;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Dashcam/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Dashcam needs camera access to record a rolling buffer while you drive.";
+				INFOPLIST_KEY_UIBackgroundModes = audio;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.AutoDashcam;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F50000000000000000000002 /* Build configuration list for PBXProject "Dashcam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F60000000000000000000001 /* Debug */,
+				F60000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F50000000000000000000003 /* Build configuration list for PBXNativeTarget "Dashcam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F60000000000000000000011 /* Debug */,
+				F60000000000000000000012 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F50000000000000000000001 /* Project object */;
+}
